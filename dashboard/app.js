@@ -161,6 +161,16 @@ function sortedRows(rows) {
 function renderTabs() {
   const counts = { all: R.rows.length, farm: 0, marginal: 0, skip: 0 };
   for (const r of R.rows) counts[scenarioOf(r).verdict]++;
+  // The "worth farming" KPI prices the same scenario as the tabs: keep it in step.
+  const kpiIdx = R.kpis.findIndex((k) => k.label.indexOf('Worth farming') === 0);
+  if (kpiIdx >= 0) {
+    const card = document.querySelectorAll('#kpis .kpi')[kpiIdx];
+    if (card) {
+      card.querySelector('.kbig').textContent = counts.farm + ' of ' + R.totals.ranked;
+      card.querySelector('.ksub').textContent = 'net beats $50 and $4 an hour at a ' + (state.planPct * 100).toFixed(2) +
+        '%-of-TVL plan; ' + counts.marginal + ' marginal, ' + counts.skip + ' skip';
+    }
+  }
   const vt = [['all', 'All'], ['farm', 'Farm'], ['marginal', 'Marginal'], ['skip', 'Skip']];
   $('#verdictTabs').innerHTML = vt.map(([key, label]) =>
     '<button type="button" class="tab' + (state.verdict === key ? ' on' : '') + '" data-verdict="' + key + '">' +
