@@ -192,13 +192,13 @@ function rowHtml(row) {
   const sc = scenarioOf(row);
   const frac = Math.min(1, Math.max(0, (Math.log(row.implied) - Math.log(row.rangeLo)) / (Math.log(row.rangeHi) - Math.log(row.rangeLo))));
   const chg = row.change7d === null ? '<span class="dim">—</span>'
-    : '<span class="' + (row.change7d >= 0 ? 'pos' : 'neg') + '">' + (row.change7d >= 0 ? '+' : '') + row.change7d.toFixed(1) + '%</span>';
+    : '<span class="' + (row.change7d >= 0 ? 'pos' : 'neg') + '">' + (row.change7d >= 0 ? '+' : '-') + Math.abs(row.change7d).toFixed(1) + '% ' + (row.change7d >= 0 ? '▲' : '▼') + '</span>';
   const vlabel = sc.verdict === 'farm' ? 'FARM' : sc.verdict === 'skip' ? 'SKIP' : 'MARGINAL';
   return '<tr data-slug="' + esc(row.slug) + '" class="' + (state.picked.has(row.slug) ? 'picked' : '') + '">' +
     '<td class="cbcol"><input type="checkbox" class="pick" data-slug="' + esc(row.slug) + '"' + (state.picked.has(row.slug) ? ' checked' : '') + ' aria-label="Pick ' + esc(row.name) + '"></td>' +
     '<td class="num">' + row.rank + '</td>' +
     '<td><div class="range-track"><div class="range-seg" style="left:6%;width:88%"></div><div class="range-dot" style="left:' + (6 + 88 * frac).toFixed(1) + '%"></div></div></td>' +
-    '<td><span class="pname">' + esc(row.name) + '</span>' + badgeHtml(row) + '<div class="psub">' + esc(row.category) + ' &middot; ' + esc(row.chainLabel) + '</div></td>' +
+    '<td><div class="pname">' + esc(row.name) + '</div><div class="psub">' + badgeHtml(row) + esc(row.category) + ' &middot; ' + esc(row.chainLabel) + '</div></td>' +
     '<td class="num">' + moneyShort(row.tvl) + '</td>' +
     '<td class="num">' + chg + '</td>' +
     '<td class="num">' + ageText(row.ageDays) + '</td>' +
@@ -242,7 +242,7 @@ function openDetail(row) {
     '<p class="dsub">Rank #' + row.rank + ' &middot; ' + esc(row.category) + ' &middot; ' + esc(row.chainLabel) + ' &middot; ' + esc(row.slug) + '</p>' +
     '<div class="dgrid">' +
     stat('TVL', moneyShort(row.tvl)) +
-    stat('7-day change', row.change7d === null ? '—' : (row.change7d >= 0 ? '+' : '') + row.change7d.toFixed(1) + '%') +
+    stat('7-day change', row.change7d === null ? '—' : (row.change7d >= 0 ? '+' : '-') + Math.abs(row.change7d).toFixed(1) + '% ' + (row.change7d >= 0 ? '▲' : '▼')) +
     stat('No-token age', ageText(row.ageDays)) +
     stat('Token odds', pct0(row.odds)) +
     stat('If it launches', moneyShort(row.valueIf)) +
@@ -256,7 +256,7 @@ function openDetail(row) {
     '</div>' +
     '<h3>Farm plan — ' + row.steps.length + ' steps</h3>' +
     '<ol>' + row.steps.map((s) => '<li>' + esc(s) + '</li>').join('') + '</ol>' +
-    '<p class="dnote">The plan is priced on the scenario set by the controls behind this view (plan size, drop share, horizon). The steps are the same ones handed in with the board; costs and times are stated inside each step.</p>';
+    '<p class="dnote">The steps are the same ones handed in with the board, priced on the scenario the board was built with (a 0.02%-of-TVL plan, capped at $25,000, a 7% drop share, 12 weeks). The figures above follow the controls behind this view; at the board&rsquo;s own scenario they match the steps exactly.</p>';
   $('#overlay').hidden = false;
   $('#detailClose').addEventListener('click', closeDetail);
 }
