@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launch Radar — pre-token protocols, valued from their own record</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="40" height="40"><circle cx="20" cy="20" r="17" fill="none" stroke="#8b9cff" stroke-width="2" opacity="0.55"/><circle cx="20" cy="20" r="10.5" fill="none" stroke="#8b9cff" stroke-width="2" opacity="0.8"/><circle cx="20" cy="20" r="4" fill="#8b9cff"/><circle cx="29" cy="13" r="2.4" fill="#4ade80"/></svg>
+      </div>
+      <div>
+        <h1>Launch Radar</h1>
+        <p class="tagline">Pre-token protocols, valued from their own record</p>
+      </div>
+    </div>
+    <p class="meta" id="metaLine"></p>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+
+  <p class="formula"><strong>Implied value</strong> = TVL &times; fitted multiple (the value if a token launches) &times; parent factor (when the family already trades) &times; token odds (from how long peers ran before recording one). Each coefficient is fitted on an ample set of datapoints and tested held-out.</p>
+
+  <section class="panel glass">
+    <div class="panel-head">
+      <h2>Protocol accounting</h2>
+      <p id="acctNote"></p>
+    </div>
+    <div class="bar" id="acctBar" role="img" aria-label="Every snapshot protocol in exactly one group"></div>
+    <div class="legend" id="acctLegend"></div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="panel glass">
+    <div class="panel-head">
+      <h2>Out-of-sample evidence</h2>
+      <p>a term is kept only if it lowers the held-out miss in both tests: leave-one-out, and walk-forward (tokens listed earlier price those listed later)</p>
+    </div>
+    <div class="evidence">
+      <div class="ev-col">
+        <h3 id="valueTitle"></h3>
+        <table class="ev" id="valueTable"></table>
+      </div>
+      <div class="ev-col">
+        <h3 id="oddsTitle"></h3>
+        <table class="ev" id="oddsTable"></table>
+      </div>
+      <div class="ev-col">
+        <h3>Is the printed range honest?</h3>
+        <table class="ev" id="rangeTable"></table>
+      </div>
+    </div>
+    <p class="coef" id="coefText"></p>
+    <p class="reading" id="readingText"></p>
+  </section>
+
+  <section class="panel glass">
+    <div class="controls">
+      <div class="tabs" id="verdictTabs" role="group" aria-label="Filter by verdict"></div>
+      <div class="tabs" id="tierTabs" role="group" aria-label="Filter by tier"></div>
+      <label class="ctl">plan size
+        <select id="planSel">
+          <option value="0.0001">0.01% of TVL</option>
+          <option value="0.0002" selected>0.02% of TVL</option>
+          <option value="0.0005">0.05% of TVL</option>
+        </select>
+      </label>
+      <label class="ctl grow">Drop share <b id="dropVal"></b>
+        <input type="range" id="dropRange" min="0" max="20" step="0.5" value="7">
+      </label>
+      <label class="ctl grow">Horizon <b id="weeksVal"></b>
+        <input type="range" id="weeksRange" min="4" max="26" step="1" value="12">
+      </label>
+    </div>
+    <div class="controls">
+      <input type="search" id="search" placeholder="Search name, chain, category" aria-label="Search">
+      <select id="catSel" aria-label="Filter by category"></select>
+      <select id="chainSel" aria-label="Filter by chain"></select>
+      <button id="resetBtn" type="button">Reset</button>
+      <button id="csvBtn" type="button">CSV</button>
+      <button id="jsonBtn" type="button">JSON</button>
+      <p class="shown" id="shownLine"></p>
+    </div>
+    <div class="tablewrap">
+      <table id="board">
+        <thead>
+          <tr>
+            <th class="cbcol"><input type="checkbox" id="pickAll" aria-label="Pick all shown rows"></th>
+            <th data-sort="rank" class="num sortable">#</th>
+            <th>Range</th>
+            <th data-sort="name" class="sortable">Protocol</th>
+            <th data-sort="tvl" class="num sortable">TVL</th>
+            <th data-sort="change7d" class="num sortable">7d</th>
+            <th data-sort="ageDays" class="num sortable">No-token age</th>
+            <th data-sort="odds" class="num sortable">Token odds</th>
+            <th data-sort="valueIf" class="num sortable">If it launches</th>
+            <th data-sort="implied" class="num sortable">Implied value</th>
+            <th class="num">P25&ndash;P75</th>
+            <th data-sort="ev" class="sortable">Verdict &middot; net of fees</th>
+            <th data-sort="netHour" class="num sortable">Net / hour</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p>A board&rsquo;s implied value is this entry&rsquo;s own claim, never a prediction and never make.fun&rsquo;s. Farm verdicts price one stated scenario (plan, drop share, horizon above); move the controls and every verdict is recomputed from the same rows. Steps, costs and times for each protocol are in its detail view, and are the same steps handed in with the board.</p>
+  </footer>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="detail" id="detail" role="dialog" aria-modal="true" aria-labelledby="detailName"></div>
+</div>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
