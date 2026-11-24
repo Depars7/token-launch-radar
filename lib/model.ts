@@ -663,15 +663,22 @@ function farmPlan(p: SnapshotProtocol, valueIf: number, odds: number): FarmPlan 
   const verdict: FarmPlan['verdict'] = ev <= 0 ? 'skip' : ev >= 50 && netHour >= 4 ? 'farm' : 'marginal';
   const oddsPct = `${Math.round(odds * 100)}%`;
   const feesTxt = `$${fees.toFixed(2)}`;
+  const rawPlan = SCENARIO.planPct * p.tvl_usd;
+  const sizing =
+    rawPlan > SCENARIO.planMax
+      ? `0.02% of its ${fmtMoneyShort(p.tvl_usd)} TVL would be ${fmtMoney(Math.round(rawPlan))}, over the plan cap, so the plan goes in at the ${fmtMoney(SCENARIO.planMax)} cap`
+      : rawPlan < SCENARIO.planMin
+        ? `0.02% of its ${fmtMoneyShort(p.tvl_usd)} TVL comes to less than the ${fmtMoney(SCENARIO.planMin)} plan minimum, so the plan goes in at the minimum`
+        : `sized at 0.02% of its ${fmtMoneyShort(p.tvl_usd)} TVL`;
   const steps = [
-    `Connect a fresh wallet to ${p.name} on ${chain} and put the plan in: ${fmtMoney(plan)} of stablecoins, sized at 0.02% of its ${fmtMoneyShort(p.tvl_usd)} TVL. Budget ${feesTxt} all-in for bridge and network fees; about 20 minutes to set up.`,
+    `Connect a fresh wallet to ${p.name} on ${chain} and put the plan in: ${fmtMoney(plan)} of stablecoins, ${sizing}. Budget ${feesTxt} all-in for bridge and network fees; about 20 minutes to set up.`,
     `Work the position for ${SCENARIO.weeks} weeks: ${coreAction(p, chain)}. About ${SCENARIO.hoursPerWeek} hours a week, ${hours} hours in all, which is what the net-per-hour figure divides by.`,
     p.chains.length > 1
       ? `In week 2, spread a second position of ${fmtMoney(Math.round(plan / 4))} to ${p.chains[1]}, the protocol's second chain, so the wallet shows up in both deployments if a snapshot is ever taken per chain.`
       : `In week 2, make a second, smaller deposit of ${fmtMoney(Math.round(plan / 4))} from the same wallet, so the record shows a returning user rather than a single visit.`,
     `Hold the full ${fmtMoney(plan)} for the whole ${SCENARIO.weeks}-week window. If the protocol's TVL doubles, top up by about ${fmtMoney(plan)} to keep the same share of any drop instead of letting the position dilute.`,
     `Watch for a launch: the peer record gives ${p.name} ${oddsPct} token odds. Check the official channels twice a week, 10 minutes at a time, so a claim or conversion window is not missed if one opens.`,
-    `Run the exit maths before adding a dollar more: if a token launches at the model's ${fmtMoneyShort(valueIf)}, the plan's expected gross is $${grossIf.toFixed(2)} against ${feesTxt} of fees, an expected $${ev.toFixed(2)} net. If fees or the time cost rise past that, stop.`,
+    `Run the exit maths before adding a dollar more: if a token launches at the model's ${fmtMoneyShort(valueIf)}, this plan's share of a 7% drop pays $${grossIf.toFixed(2)}; the expected gross is odds × payout = ${(odds * 100).toFixed(2)}% × $${grossIf.toFixed(2)} = $${(odds * grossIf).toFixed(2)}, and less ${feesTxt} of fees that is an expected $${ev.toFixed(2)} net. If fees or the time cost rise past that, stop.`,
   ];
   return { plan, fees, grossIf, ev, netHour, verdict, steps };
 }
